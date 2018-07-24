@@ -6,6 +6,7 @@ import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import io.reactivex.Single
 import ru.mininn.github.model.GitUser
+
 @Dao
 interface GitUserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
