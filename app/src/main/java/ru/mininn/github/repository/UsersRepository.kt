@@ -7,16 +7,22 @@ import ru.mininn.github.database.GitUserDao
 import ru.mininn.github.model.GitUser
 import ru.mininn.github.rest.GitApi
 
-class UserSRepository(private val dao: GitUserDao, private val apiClient: GitApi) {
+class UsersRepository(private val dao: GitUserDao, private val apiClient: GitApi) {
     private var lastUserId: Int = 0
     private var cachedUsers = Observable.fromArray(ArrayList<GitUser>())
 
-    fun getUsers(): Observable<List<GitUser>> {
+    fun getUsers(refresh: Boolean): Observable<List<GitUser>> {
+        if (refresh) {
+            lastUserId = 0
+        }
         return Observable.combineLatest(cachedUsers, getUsersFromApi(),
                 BiFunction<ArrayList<GitUser>, List<GitUser>, List<GitUser>> { cached, rest ->
-            cached.addAll(rest)
-            cached
-        }).onErrorResumeNext(getUsersFromDb())
+                    if (refresh) {
+                        cached.clear()
+                    }
+                    cached.addAll(rest)
+                    cached
+                }).onErrorResumeNext(getUsersFromDb())
     }
 
     private fun getUsersFromApi(): Observable<List<GitUser>> {
@@ -30,7 +36,9 @@ class UserSRepository(private val dao: GitUserDao, private val apiClient: GitApi
 
     private fun getUsersFromDb(): Observable<List<GitUser>> {
         return dao.getAllUsers()
-                .toObservable()
+                .toObservable().doOnNext {
+                    lastUserId = it[it.lastIndex].id
+                }
     }
 
     private fun saveToDb(users: List<GitUser>) {

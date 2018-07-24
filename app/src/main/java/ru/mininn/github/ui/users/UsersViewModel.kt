@@ -8,24 +8,28 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import ru.mininn.github.database.Database
 import ru.mininn.github.model.GitUser
-import ru.mininn.github.repository.UserSRepository
+import ru.mininn.github.repository.UsersRepository
 import ru.mininn.github.rest.GitApiClient
 
 class UsersViewModel(application: Application) : AndroidViewModel(application) {
 
     private val usersLiveData = MutableLiveData<List<GitUser>>()
 
-    private val userRepository by lazy { UserSRepository(
+    private val userRepository by lazy { UsersRepository(
             Database.databaseBuilder(application.applicationContext).allowMainThreadQueries().build().getUserDao(), GitApiClient.create()) }
 
     fun getUsers() : LiveData<List<GitUser>>{
+        if (usersLiveData.value == null){
+            usersLiveData.value = ArrayList<GitUser>()
+        }
         return usersLiveData
     }
 
-    fun requestUsers() {
-        userRepository.getUsers()
+    fun requestUsers(refresh : Boolean) {
+        userRepository.getUsers(refresh)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ usersLiveData.postValue(it) }, { it.printStackTrace() })
     }
+
 }
