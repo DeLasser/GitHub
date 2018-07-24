@@ -14,7 +14,4 @@ interface GitUserDao {
     @Query("SELECT * FROM GitUser")
     fun getAllUsers(): Single<List<GitUser>>
 
-    @Query("DELETE FROM GitUser WHERE id > :user_id")
-    fun delleteFromId(user_id : Int)
-
 }

@@ -1,6 +1,5 @@
 package ru.mininn.github.repository
 
-import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
@@ -8,17 +7,16 @@ import ru.mininn.github.database.GitUserDao
 import ru.mininn.github.model.GitUser
 import ru.mininn.github.rest.GitApi
 
-class UserRepository(private val dao: GitUserDao, private val apiClient: GitApi) {
+class UserSRepository(private val dao: GitUserDao, private val apiClient: GitApi) {
     private var lastUserId: Int = 0
-    private var cachedUsers = ArrayList<GitUser>()
+    private var cachedUsers = Observable.fromArray(ArrayList<GitUser>())
 
     fun getUsers(): Observable<List<GitUser>> {
-        return getUsersFromApi().onErrorResumeNext(getUsersFromDb())
-
-    }
-
-    fun getMoreUsers(): Observable<List<GitUser>> {
-        return getUsersFromApi()
+        return Observable.combineLatest(cachedUsers, getUsersFromApi(),
+                BiFunction<ArrayList<GitUser>, List<GitUser>, List<GitUser>> { cached, rest ->
+            cached.addAll(rest)
+            cached
+        }).onErrorResumeNext(getUsersFromDb())
     }
 
     private fun getUsersFromApi(): Observable<List<GitUser>> {
@@ -41,9 +39,5 @@ class UserRepository(private val dao: GitUserDao, private val apiClient: GitApi)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
                 .subscribe()
-    }
-
-    private fun clearDbFromId(id: Int) {
-        dao.delleteFromId(id)
     }
 }

@@ -8,6 +8,6 @@ import ru.mininn.github.model.GitUser
 interface GitApi {
 
     @GET("users")
-    fun getUsers(@Query("since") user : Int):
+    fun getUsers(@Query("since") user: Int):
             Observable<List<GitUser>>
 }
