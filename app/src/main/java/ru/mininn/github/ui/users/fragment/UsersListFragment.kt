@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,25 +17,42 @@ import ru.mininn.github.ui.users.UsersViewModel
 import ru.mininn.github.ui.users.adapter.UsersAdapter
 
 class UsersListFragment : Fragment(), Observer<List<GitUser>>, SwipeRefreshLayout.OnRefreshListener {
+    private val RECYCLER_STATE = "recycler_state"
     private var recyclerView: RecyclerView? = null
-
     private var layout: SwipeRefreshLayout? = null
     private var adapter: UsersAdapter? = null
     private var layoutManager: LinearLayoutManager? = null
     private val usersViewModel by lazy { ViewModelProviders.of(this).get(UsersViewModel::class.java) }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_users_list, container, false)
         initViews(view)
         layout?.setOnRefreshListener(this)
         initAdapter()
+
         return view
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        retainInstance = true
         usersViewModel.getUsers().observe(this, this)
         if (usersViewModel.getUsers().value!!.isEmpty()) {
             usersViewModel.requestUsers(false)
+        } else {
+            initPagination()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable(RECYCLER_STATE, layoutManager!!.onSaveInstanceState())
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        if (savedInstanceState != null) {
+            layoutManager?.onRestoreInstanceState(savedInstanceState.getParcelable(RECYCLER_STATE))
         }
     }
 
@@ -68,8 +84,8 @@ class UsersListFragment : Fragment(), Observer<List<GitUser>>, SwipeRefreshLayou
         recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                val firstVisibleItemPosition : Int = layoutManager!!.findFirstVisibleItemPosition()
-                if (firstVisibleItemPosition >= (adapter!!.itemCount - 15) ) {
+                val firstVisibleItemPosition: Int = layoutManager!!.findFirstVisibleItemPosition()
+                if (firstVisibleItemPosition >= (adapter!!.itemCount - 15)) {
                     usersViewModel.requestUsers(false)
                     recyclerView?.removeOnScrollListener(this)
                 }
