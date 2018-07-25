@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">GitHub</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="bio">Bio</string>
+    <string name="company">Company</string>
+    <string name="email_not_found">Email is hidden</string>
+    <string name="no_company">No company</string>
+    <string name="no_bio">No bio</string>
 </resources>

@@ -5,6 +5,7 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import ru.mininn.github.database.GitUserDao
 import ru.mininn.github.model.GitUser
+import ru.mininn.github.model.GitUserProfile
 import ru.mininn.github.rest.GitApi
 
 class UsersRepository(private val dao: GitUserDao, private val apiClient: GitApi) {
@@ -23,6 +24,10 @@ class UsersRepository(private val dao: GitUserDao, private val apiClient: GitApi
                     cached.addAll(rest)
                     cached
                 }).onErrorResumeNext(getUsersFromDb())
+    }
+
+    fun getUserDetails(url : String) : Observable<GitUserProfile>{
+        return apiClient.getUserInfo(url)
     }
 
     private fun getUsersFromApi(): Observable<List<GitUser>> {
