@@ -3,7 +3,6 @@ package ru.mininn.github.ui.userDetail
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.widget.TextView
@@ -15,17 +14,17 @@ import ru.mininn.github.model.GitUserProfile
 class UserDetailsActivity : AppCompatActivity(), Observer<GitUserProfile> {
     private val userViewModel by lazy { ViewModelProviders.of(this).get(UserDetailViewModel::class.java) }
 
-    private var name : TextView? = null
-    private var email : TextView? = null
-    private var company : TextView? = null
-    private var bio : TextView? = null
+    private var name: TextView? = null
+    private var email: TextView? = null
+    private var company: TextView? = null
+    private var bio: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_detail)
         initViews()
         userViewModel.userLiveData.observe(this, this)
-        if (userViewModel.userLiveData.value != null ) {
+        if (userViewModel.userLiveData.value != null) {
             setData(userViewModel.userLiveData.value!!)
         } else if (intent.getStringExtra(Constants.PROFILE_URL_KEY) != null) {
             userViewModel.requestUsers(intent.getStringExtra(Constants.PROFILE_URL_KEY))

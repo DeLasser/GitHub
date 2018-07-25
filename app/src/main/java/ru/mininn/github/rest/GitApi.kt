@@ -13,5 +13,5 @@ interface GitApi {
     fun getUsers(@Query("since") user: Int): Observable<List<GitUser>>
 
     @GET
-    fun getUserInfo(@Url url : String) : Observable<GitUserProfile>
+    fun getUserInfo(@Url url: String): Observable<GitUserProfile>
 }

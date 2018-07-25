@@ -13,6 +13,4 @@ class GitUser(@PrimaryKey @Expose @SerializedName("id")
               @Expose @SerializedName("url")
               var url: String,
               @Expose @SerializedName("avatar_url")
-              var avatarUrl: String
-) {
-}
+              var avatarUrl: String)

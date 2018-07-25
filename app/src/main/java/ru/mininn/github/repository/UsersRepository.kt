@@ -26,7 +26,7 @@ class UsersRepository(private val dao: GitUserDao, private val apiClient: GitApi
                 }).onErrorResumeNext(getUsersFromDb())
     }
 
-    fun getUserDetails(url : String) : Observable<GitUserProfile>{
+    fun getUserDetails(url: String): Observable<GitUserProfile> {
         return apiClient.getUserInfo(url)
     }
 
