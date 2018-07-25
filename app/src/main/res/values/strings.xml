@@ -7,4 +7,8 @@
     <string name="email_not_found">Email is hidden</string>
     <string name="no_company">No company</string>
     <string name="no_bio">No bio</string>
+    <string name="application_name">App name</string>
+    <string name="build_version">Build version</string>
+    <string name="users">Users</string>
+    <string name="build">Build</string>
 </resources>
